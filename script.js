@@ -1,0 +1,51 @@
+const formId = 'main'
+const form = document.getElementById(formId)
+//функция для захвата данных из тегов формы и синтеза JSON-обьекта 
+function toJSONString(form) {
+  var obj = {}
+  var element = form.querySelector('.input')
+
+  
+  obj['msg']=element.value;
+
+  return JSON.stringify(obj)
+}
+if (form) {
+  form.addEventListener('submit', event => {
+    event.preventDefault()
+    //получаем данные из формы
+    const json = toJSONString(form)
+    //создаем соединение
+    const formReq = new XMLHttpRequest()
+    formReq.open('POST', '/telegram', true)
+    ///////////////////////////////////
+    /////////////SweetAlert//////////
+    ///////////////////////////////////
+    //обрабатываем ответ сервера
+    formReq.onload = function(oEvent) {
+      if (formReq.status === 200) {
+        swal({
+          title: 'Успешно отправлено!',
+          icon: 'success',
+          timer: 2000
+        })
+        document.querySelector('.sa-success').style.display = 'block'
+        document.querySelector('.sa-button-container').style.opacity = '0'
+      }
+      if (formReq.status !== 200) {
+        swal({
+          title: 'Произошла ошибка!',
+          icon: 'error',
+          timer: 2000
+        })
+        document.querySelector('.sa-error').style.display = 'block'
+        document.querySelector('.sa-button-container').style.opacity = '0'
+      }
+    }
+    ////////////////////////////
+    ////////////////////////////
+    formReq.setRequestHeader('Content-Type', 'application/json')
+    //отправляем
+    formReq.send(json)
+  })
+}
